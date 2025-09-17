@@ -1,2 +1,2 @@
-# AR Project (Demo)
-Lm5的「瀏覽器 3D/AR」展示
+# AR Project
+電子號火箭的「瀏覽器 3D/AR」展示
