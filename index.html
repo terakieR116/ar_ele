@@ -33,7 +33,6 @@
   </style>
 </head>
 <body>
-
   <model-viewer
     src="model_ele.glb"
     ios-src="model_ele.usdz"
@@ -43,21 +42,33 @@
     camera-controls
     auto-rotate
     shadow-intensity="1">
-
-    <!-- 自訂 AR 按鈕：只有支援 AR 的裝置才會顯示 -->
+    <!-- 自訂 AR 按鈕：只有支援 AR 的裝置會顯示 -->
     <button slot="ar-button" id="ar-button">在 AR 中查看</button>
   </model-viewer>
 
-  <!-- iOS Safari 的保險連結（Quick Look） -->
-  <a id="ios-ar-fallback" rel="ar" href="model_ele.usdz">iOS 連結開 AR</a>
+  <!-- iOS 永遠顯示的備援連結（Quick Look），新分頁開啟 -->
+  <a id="ios-ar-fallback" rel="ar" href="model_ele.usdz" target="_blank"
+     style="position:fixed;left:12px;bottom:12px;z-index:9998;
+            padding:8px 12px;border-radius:10px;border:1px solid #eee;
+            background:#fffbe6;font-size:13px;text-decoration:none;color:#222;">
+    iOS 連結開 AR
+  </a>
 
+  <!-- 若偵測到 in-app（LINE/FB/IG…）提醒用 Safari 開啟 -->
   <script>
-    // 只在 iOS Safari 顯示備援連結（避免 Android/桌面看到沒用的連結）
-    const ua = navigator.userAgent;
-    const isiOS = /iPhone|iPad|iPod/.test(ua);
-    const isSafari = isiOS && /Safari/.test(ua) && !/CriOS|FxiOS/.test(ua);
-    if (isSafari) document.getElementById('ios-ar-fallback').style.display = 'inline-block';
+    (function () {
+      const ua = navigator.userAgent.toLowerCase();
+      const inApp = /(line|fbav|fban|fbios|instagram|gsa|twitter|snapchat)/i.test(ua);
+      if (inApp) {
+        const tip = document.createElement('div');
+        tip.textContent = '請用 Safari 開啟此頁，才能使用 iOS AR（Quick Look）。';
+        tip.style.cssText =
+          'position:fixed;left:0;right:0;top:0;padding:10px;background:#fff3cd;'+
+          'border-bottom:1px solid #ffeeba;font-size:14px;text-align:center;z-index:9999;';
+        document.body.appendChild(tip);
+      }
+    })();
   </script>
-
 </body>
+
 </html>
