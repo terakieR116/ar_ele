@@ -1,38 +1,44 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>電子號火箭 Electron | Web 3D + AR</title>
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
   <style>
     html, body { margin:0; height:100%; }
     model-viewer { width:100vw; height:100vh; display:block; }
-    /* 漂浮在畫面上的 AR 按鈕（<model-viewer> 會只在支援 AR 的裝置顯示它） */
-    #ar-button {
-      position: fixed;
-      right: 12px; bottom: 12px;
-      z-index: 9999;
-      padding: 10px 14px;
-      border-radius: 999px; border: 1px solid #ddd;
-      background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.15);
-      font-size: 14px;
+    /* 置頂的 iOS AR 按鈕（永遠可見，不會被 100vh 蓋掉） */
+    #iosBar {
+      position: fixed; left: 0; right: 0;
+      top: calc(8px + env(safe-area-inset-top, 0px));
+      z-index: 10000; display: flex; justify-content: center;
+      pointer-events: none; /* 下面3D可旋轉；按鈕本身可點 */
     }
-    /* iOS 備援連結：只有在 iOS Safari 顯示 */
-    #ios-ar-fallback {
-      position: fixed;
-      left: 12px; bottom: 12px;
-      z-index: 9998;
-      padding: 8px 12px;
-      border-radius: 10px; border: 1px solid #eee;
-      background: #fffbe6;
-      font-size: 13px;
-      display: none;
-      text-decoration: none; color: #222;
+    #openAR {
+      pointer-events: auto;
+      padding: 10px 14px; border-radius: 999px;
+      background:#111; color:#fff; text-decoration:none;
+      box-shadow:0 2px 10px rgba(0,0,0,.2); font-size:14px;
+    }
+    /* in-app 提示條 */
+    #inappTip {
+      position: fixed; left:0; right:0; top:0;
+      padding:10px; background:#fff3cd; border-bottom:1px solid #ffeeba;
+      font-size:14px; text-align:center; z-index:10001; display:none;
     }
   </style>
 </head>
 <body>
+
+  <!-- iOS 一鍵開 AR（Quick Look），新分頁開啟，避免被攔截 -->
+  <div id="iosBar">
+    <a id="openAR" rel="ar" target="_blank" href="https://terakieR116.github.io/ar_ele/model_ele.usdz">
+      📱 iOS 直接開 AR
+    </a>
+  </div>
+  <div id="inappTip">請用「在 Safari 開啟」再試，iOS AR 在 LINE/FB 內建瀏覽器常無法啟動。</div>
+
   <model-viewer
     src="model_ele.glb"
     ios-src="model_ele.usdz"
@@ -42,33 +48,22 @@
     camera-controls
     auto-rotate
     shadow-intensity="1">
-    <!-- 自訂 AR 按鈕：只有支援 AR 的裝置會顯示 -->
+    <!-- Android/WebXR/可用裝置會顯示這顆 -->
     <button slot="ar-button" id="ar-button">在 AR 中查看</button>
   </model-viewer>
 
-  <!-- iOS 永遠顯示的備援連結（Quick Look），新分頁開啟 -->
-  <a id="ios-ar-fallback" rel="ar" href="model_ele.usdz" target="_blank"
-     style="position:fixed;left:12px;bottom:12px;z-index:9998;
-            padding:8px 12px;border-radius:10px;border:1px solid #eee;
-            background:#fffbe6;font-size:13px;text-decoration:none;color:#222;">
-    iOS 連結開 AR
-  </a>
-
-  <!-- 若偵測到 in-app（LINE/FB/IG…）提醒用 Safari 開啟 -->
   <script>
+    // 偵測 in-app（LINE/FB/IG…）→ 顯示提示條
     (function () {
       const ua = navigator.userAgent.toLowerCase();
       const inApp = /(line|fbav|fban|fbios|instagram|gsa|twitter|snapchat)/i.test(ua);
-      if (inApp) {
-        const tip = document.createElement('div');
-        tip.textContent = '請用 Safari 開啟此頁，才能使用 iOS AR（Quick Look）。';
-        tip.style.cssText =
-          'position:fixed;left:0;right:0;top:0;padding:10px;background:#fff3cd;'+
-          'border-bottom:1px solid #ffeeba;font-size:14px;text-align:center;z-index:9999;';
-        document.body.appendChild(tip);
-      }
+      if (inApp) document.getElementById('inappTip').style.display = 'block';
     })();
-  </script>
-</body>
 
+    // iPad 若開「要求桌面版網站」，<model-viewer> 的 AR 鈕可能被隱藏
+    // 我們改成：iOS AR 用上面那顆固定按鈕，永遠可見
+    // （Android 不受影響，仍走 webxr/scene-viewer）
+  </script>
+
+</body>
 </html>
