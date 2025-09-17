@@ -1,32 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>電子號火箭 Electron | Web 3D + AR</title>
-  <!-- Use model-viewer from Google CDN -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
   <style>
-    html, body { margin: 0; height: 100%; }
-    model-viewer { width: 100vw; height: 100vh; }
+    html, body { margin:0; height:100%; }
+    model-viewer { width:100vw; height:100vh; display:block; }
+    /* 漂浮在畫面上的 AR 按鈕（<model-viewer> 會只在支援 AR 的裝置顯示它） */
+    #ar-button {
+      position: fixed;
+      right: 12px; bottom: 12px;
+      z-index: 9999;
+      padding: 10px 14px;
+      border-radius: 999px; border: 1px solid #ddd;
+      background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.15);
+      font-size: 14px;
+    }
+    /* iOS 備援連結：只有在 iOS Safari 顯示 */
+    #ios-ar-fallback {
+      position: fixed;
+      left: 12px; bottom: 12px;
+      z-index: 9998;
+      padding: 8px 12px;
+      border-radius: 10px; border: 1px solid #eee;
+      background: #fffbe6;
+      font-size: 13px;
+      display: none;
+      text-decoration: none; color: #222;
+    }
   </style>
 </head>
 <body>
 
-<model-viewer
-  src="model_ele.glb"
-  ios-src="model_ele.usdz"
-  alt="Electron"
-  ar
-  ar-modes="webxr scene-viewer quick-look"
-  camera-controls
-  auto-rotate
-  shadow-intensity="1">
-</model-viewer>
-<p>
-  <a rel="ar" href="https://terakieR116.github.io/ar_ele/model_ele.usdz">
-    在 iOS 的 AR 中查看
-  </a>
-</p>
+  <model-viewer
+    src="model_ele.glb"
+    ios-src="model_ele.usdz"
+    alt="Electron"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1">
+
+    <!-- 自訂 AR 按鈕：只有支援 AR 的裝置才會顯示 -->
+    <button slot="ar-button" id="ar-button">在 AR 中查看</button>
+  </model-viewer>
+
+  <!-- iOS Safari 的保險連結（Quick Look） -->
+  <a id="ios-ar-fallback" rel="ar" href="model_ele.usdz">iOS 連結開 AR</a>
+
+  <script>
+    // 只在 iOS Safari 顯示備援連結（避免 Android/桌面看到沒用的連結）
+    const ua = navigator.userAgent;
+    const isiOS = /iPhone|iPad|iPod/.test(ua);
+    const isSafari = isiOS && /Safari/.test(ua) && !/CriOS|FxiOS/.test(ua);
+    if (isSafari) document.getElementById('ios-ar-fallback').style.display = 'inline-block';
+  </script>
+
 </body>
 </html>
