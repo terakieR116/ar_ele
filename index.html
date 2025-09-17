@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>電子號火箭 Electron | Web 3D + AR</title>
+  <!-- Use model-viewer from Google CDN -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; }
+    model-viewer { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+
+<model-viewer
+  src="model_ele.glb"
+  ios-src="model_ele.usdz"
+  alt="Electron"
+  ar
+  ar-modes="webxr scene-viewer quick-look"
+  camera-controls
+  auto-rotate
+  shadow-intensity="1">
+</model-viewer>
+<!-- iOS 明確後備連結（即使按鈕沒出現，也能點這個觸發 Quick Look） -->
+<p><a rel="ar" href="./model_sls.usdz">在 iOS 的 AR 中查看</a></p>
+</body>
+</html>
